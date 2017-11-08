@@ -37,11 +37,14 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
     ```sh
     dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4  elevator=deadline fsck.repair=yes rootwait
     ```
-
 * Install Python Package Manager PIP if not already installed (not installed on Rasbian Lite):
     ```sh
     $ sudo apt-get install python-pip
     ```
+* Install Git if not already installed (not installed on Rasbian Lite):
+    ```sh
+    $ sudo apt-get install git
+    ```    
 
 ### Installation
 #### Install InfluxDB
@@ -85,12 +88,13 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
     ```
 * Now install
     ```sh
-    $ sudo apt-get update && sudo apt-get install grafana 
+    $ sudo apt-get update
+    $ sudo apt-get install grafana 
     ```
 * Start the service using systemd:
     ```sh
     $ sudo systemctl daemon-reload
-    $ systemctl start grafana-server
+    $ sudo systemctl start grafana-server
     $ systemctl status grafana-server
     ```
 * Enable the systemd service so that Grafana starts at boot.
