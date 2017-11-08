@@ -3,10 +3,14 @@
 from influxdb import InfluxDBClient
 from datetime import datetime, timedelta
 from os import path
+import sys
+import os
 import minimalmodbus
 import time
 import yaml
 
+# Change working dir to the same dir as this script
+os.chdir(sys.path[0])
 
 class DataCollector:
     def __init__(self, influx_client, meter_yaml):
@@ -61,8 +65,16 @@ class DataCollector:
             instrument.address = meter['id']    # this is the slave address number
 
             #print 'Reading meter %s (%s).' % (meters[meter_id], meter_id)
+
+            assert path.exists(meter['type']), 'Meter model yaml file not found: %s' % meter['type']
+            try:
+                parameters = yaml.load(open(meter['type']))
+            except Exception as e:
+                print('Error! Loading model yaml file')
+                print(e)
+                raise
+
             start_time = time.time()
-            parameters = yaml.load(open(meter['type']))
             datas[meter['id']] = dict()
 
             for parameter in parameters:
@@ -104,7 +116,10 @@ def repeat(interval_sec, max_iter, func, *args, **kwargs):
     from itertools import count
     import time
     starttime = time.time()
+    retry = False
     for i in count():
+        if (retry == False) & (interval_sec > 0):
+            time.sleep(interval_sec - ((time.time() - starttime) % interval_sec))
         retry = False # Reset retry flag
         if i % 1000 == 0:
             print('Collected %d readouts' % i)
@@ -114,8 +129,7 @@ def repeat(interval_sec, max_iter, func, *args, **kwargs):
             print('Error!')
             print(ex)
             retry = True # Force imidiate retry, skip sleep
-        if (retry == False) & (interval_sec > 0):
-            time.sleep(interval_sec - ((time.time() - starttime) % interval_sec))
+
         if max_iter and i >= max_iter:
             return
 

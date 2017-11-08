@@ -64,13 +64,13 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 * Start the influxdb service
     ```sh
     $ sudo service influxdb start
-    $ sudo service influxdb restart
+    $ sudo service influxdb restart
     ```
 
 * Create the database
     ```sh
-    $ sudo influx
-    CREATE DATABASE db_meters
+    $ sudo influx
+     CREATE DATABASE db_meters
     exit 
     ```
 
@@ -106,8 +106,13 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 #### Install Energy Meter Logger:
 * Download and install from github
     ```sh
-    $ pip install git+https://github.com/samuelphy/energy-meter-logger
+    $ git clone https://github.com/samuelphy/energy-meter-logger
     ```
+* Run setup script
+    ```sh
+    $ cd energy-meter-logger
+    $ sudo python setup.py install
+    ```    
 * Make script file executable
     ```sh
     $ chmod 777 read_energy_meter.py
@@ -120,5 +125,5 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 * Run the python script at startup. Add to following lines to the end of /etc/rc.local but before exit:
     ```sh
     # Start Elphy Energy Meter Logger
-    /home/pi/read_energy_meter.py --interval 60 > /var/log/meter.log &
+    /home/pi/energy-meter-logger/read_energy_meter.py --interval 60 > /var/log/meter.log &
     ```

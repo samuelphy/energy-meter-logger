@@ -10,11 +10,6 @@ except ImportError:
     with io.open('README.md', encoding="utf-8") as f:
         readme = f.read()
 
-template_patterns = [
-    '*.yml',
-    '*.py',
-    ]
-
 setup(name='energy_meter_logger',
       version=0.1,
       description='Read Energy Meter data using RS485 Modbus '+
@@ -37,8 +32,6 @@ setup(name='energy_meter_logger',
       install_requires=[]+(['pyserial','minimalmodbus', 'influxdb', 'pyyaml'] if "linux" in sys.platform else []),
       license='MIT',
       packages=[],
-      package_data=dict( (package_name, template_patterns)
-                         for package_name in packages ),
       include_package_data=True,
       tests_require=[],
       test_suite='',
