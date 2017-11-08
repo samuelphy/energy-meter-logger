@@ -38,7 +38,7 @@ setup(name='energy_meter_logger',
       license='MIT',
       packages=packages,
       package_data=dict( (package_name, template_patterns)
-                         for package_name in packages ))
+                         for package_name in packages ),
       include_package_data=True,
       tests_require=[],
       test_suite='',
