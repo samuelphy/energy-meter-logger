@@ -1,8 +1,6 @@
 import sys
 from setuptools import setup
 
-import ruuvitag_sensor
-
 try:
     import pypandoc
     readme = pypandoc.convert('README.md', 'rst')
