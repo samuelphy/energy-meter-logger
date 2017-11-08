@@ -1,0 +1,5 @@
+host : 'localhost'
+port : 8086
+user : 'root'
+password : 'root'
+dbname : 'db_meters'
