@@ -28,20 +28,20 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
     ```
 * With raspi-config open, go to
     `5 Interfacing Options` -> `P6 Serial` and `Disable serial login shell` and `Enable serial port hardware` (i.e. NO and then YES)
-* Add the following lines to `/boot/config.txt` [source](http://www.briandorey.com/post/Raspberry-Pi-3-UART-Boot-Overlay-Part-Two)
+* To be able to use the UART you need to disable the built in Bluetooth since it shares the UART. To do so, add the following lines to `/boot/config.txt` [source](http://www.briandorey.com/post/Raspberry-Pi-3-UART-Boot-Overlay-Part-Two)
     ```sh
     # Disable built in Bluetooth
     dtoverlay=pi3-miniuart-bt
     ```
 * To disable the serial console, you need to edit the /boot/cmdline.txt file to look like the following row. [source](http://www.briandorey.com/post/Raspberry-Pi-3-UART-Boot-Overlay-Part-Two)
     ```sh
-    dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4  elevator=deadline fsck.repair=yes rootwait
+    dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
     ```
-* Install Python Package Manager PIP if not already installed (not installed on Rasbian Lite):
+* Install Python Package Manager PIP if not already installed (not installed on Raspbian Lite):
     ```sh
     $ sudo apt-get install python-pip
     ```
-* Install Git if not already installed (not installed on Rasbian Lite):
+* Install Git if not already installed (not installed on Raspbian Lite):
     ```sh
     $ sudo apt-get install git
     ```    
@@ -66,11 +66,10 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
     $ sudo service influxdb start
     $ sudo service influxdb restart
     ```
-
 * Create the database
     ```sh
     $ sudo influx
-     CREATE DATABASE db_meters
+    CREATE DATABASE db_meters
     exit 
     ```
 
@@ -104,7 +103,7 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 * Go to http://localhost:3000 and login using admin / admin (remember to change password)
 
 #### Install Energy Meter Logger:
-* Download and install from github
+* Download and install from Github
     ```sh
     $ git clone https://github.com/samuelphy/energy-meter-logger
     ```
@@ -122,8 +121,9 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
     ```sh
     ./read_energy_meter.py
     ```
-* Run the python script at startup. Add to following lines to the end of /etc/rc.local but before exit:
+* To run the python script at system startup. Add to following lines to the end of /etc/rc.local but before exit:
     ```sh
-    # Start Elphy Energy Meter Logger
-    /home/pi/energy-meter-logger/read_energy_meter.py --interval 60 > /var/log/meter.log &
+    # Start Energy Meter Logger
+    /home/pi/energy-meter-logger/read_energy_meter.py --interval 60 > /var/log/energy_meter.log &
     ```
+    Log with potential errors are found in /var/log/energy_meter.log
