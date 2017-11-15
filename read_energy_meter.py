@@ -27,23 +27,23 @@ class DataCollector:
         assert path.exists(self.meter_yaml), 'Meter map not found: %s' % self.meter_yaml
         if path.getmtime(self.meter_yaml) != self.meter_map_last_change:
             try:
-                print('Reloading meter map as file changed')
+                print ('Reloading meter map as file changed')
                 new_map = yaml.load(open(self.meter_yaml))
                 self.meter_map = new_map['meters']
                 self.meter_map_last_change = path.getmtime(self.meter_yaml)
             except Exception as e:
-                print('Failed to re-load meter map, going on with the old one. Error:')
-                print(e)
+                print ('Failed to re-load meter map, going on with the old one. Error:')
+                print (e)
         return self.meter_map
 
     def collect_and_store(self):
+        #instrument.debug = True
         meters = self.get_meters()
         t_utc = datetime.utcnow()
         t_str = t_utc.isoformat() + 'Z'
 
         instrument = minimalmodbus.Instrument('/dev/ttyAMA0', 1) # port name, slave address (in decimal)
         instrument.mode = minimalmodbus.MODE_RTU   # rtu or ascii mode
-        #instrument.debug = True
         datas = dict()
         meter_id_name = dict() # mapping id to name
 
@@ -58,33 +58,46 @@ class DataCollector:
             elif meter['parity'] == 'even':
                 instrument.serial.parity = minimalmodbus.serial.PARITY_EVEN
             else:
-                print('Error! No parity specified')
+                print ('Error: No parity specified')
                 raise
             instrument.serial.stopbits = meter['stopbits']
             instrument.serial.timeout  = meter['timeout']    # seconds
             instrument.address = meter['id']    # this is the slave address number
 
-            #print 'Reading meter %s (%s).' % (meters[meter_id], meter_id)
-
-            assert path.exists(meter['type']), 'Meter model yaml file not found: %s' % meter['type']
-            try:
-                parameters = yaml.load(open(meter['type']))
-            except Exception as e:
-                print('Error! Loading model yaml file')
-                print(e)
-                raise
-
+            #print 'Reading meter %s.' % (meter['id'])
             start_time = time.time()
+            parameters = yaml.load(open(meter['type']))
             datas[meter['id']] = dict()
 
             for parameter in parameters:
-                try:
-                    datas[meter['id']][parameter] = instrument.read_float(parameters[parameter], 4, 2)
-                    pass
-                except Exception as e:
-                    print('Reading register %i from meter %i. Error:' % parameters[parameter], meter['id'])
-                    print(e)
-                    raise
+                retries = 10
+                while retries > 0:
+                    try:
+                        retries -= 1
+                        datas[meter['id']][parameter] = instrument.read_float(parameters[parameter], 4, 2)
+                        retries = 0
+                        pass
+                    except ValueError as ve:
+                        print ('Value Error while reading register {} from meter {}. Retries left {}.'
+                               .format(parameters[parameter], meter['id'], retries))
+                        print ve
+                        if retries == 0:
+                            raise RuntimeError
+                    except TypeError as te:
+                        print ('Type Error while reading register {} from meter {}. Retries left {}.'
+                               .format(parameters[parameter], meter['id'], retries))
+                        print te
+                        if retries == 0:
+                            raise RuntimeError
+                    except IOError as ie:
+                        print ('IO Error while reading register {} from meter {}. Retries left {}.'
+                               .format(parameters[parameter], meter['id'], retries))
+                        print ie
+                        if retries == 0:
+                            raise RuntimeError
+                    except:
+                        print "Unexpected error:", sys.exc_info()[0]
+                        raise
 
             datas[meter['id']]['Time to read'] =  time.time() - start_time
 
@@ -128,8 +141,7 @@ def repeat(interval_sec, max_iter, func, *args, **kwargs):
         except Exception as ex:
             print('Error!')
             print(ex)
-            retry = True # Force imidiate retry, skip sleep
-
+            #retry = True # Force imidiate retry, skip sleep
         if max_iter and i >= max_iter:
             return
 
@@ -145,7 +157,7 @@ if __name__ == '__main__':
                         help='YAML file containing Meter ID, name, type etc. Default "meters.yml"')
     args = parser.parse_args()
     interval = int(args.interval)
-
+    
     # Create the InfluxDB object
     influx_config = yaml.load(open('influx_config.yml'))
     client = InfluxDBClient(influx_config['host'],
@@ -155,7 +167,7 @@ if __name__ == '__main__':
                             influx_config['dbname'])
 
     collector = DataCollector(influx_client=client,
-                              meter_yaml='meters.yml')
+                              meter_yaml=args.meters)
 
     repeat(interval,
            max_iter=collector.max_iterations,

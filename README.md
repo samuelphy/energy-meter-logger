@@ -14,9 +14,9 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 
 * Rasbian
 * Python 2.7 and PIP
-* Minimalmodbus
-* InfluxDB
-* Grafana
+* [Minimalmodbus](https://minimalmodbus.readthedocs.io/en/master/)
+* [InfluxDB](https://docs.influxdata.com/influxdb/v1.3/)
+* [Grafana](http://docs.grafana.org/)
 
 ### Prerequisite
 
