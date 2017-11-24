@@ -50,7 +50,7 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 #### Install InfluxDB
 [source](https://docs.influxdata.com/influxdb/v1.3/introduction/installation/)
 
-#### Step-by-step instructions
+##### Step-by-step instructions
 * Add the InfluxData repository
     ```sh
     $ curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
@@ -64,11 +64,10 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 * Start the influxdb service
     ```sh
     $ sudo service influxdb start
-    $ sudo service influxdb restart
     ```
 * Create the database
     ```sh
-    $ sudo influx
+    $ influx
     CREATE DATABASE db_meters
     exit 
     ```
@@ -87,8 +86,7 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
     ```
 * Now install
     ```sh
-    $ sudo apt-get update
-    $ sudo apt-get install grafana 
+    $ sudo apt-get update && sudo apt-get install grafana 
     ```
 * Start the service using systemd:
     ```sh
@@ -107,7 +105,7 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
     ```sh
     $ git clone https://github.com/samuelphy/energy-meter-logger
     ```
-* Run setup script
+* Run setup script (must be executed as root (sudo) if the application needs to be started from rc.local, see below)
     ```sh
     $ cd energy-meter-logger
     $ sudo python setup.py install
@@ -120,6 +118,7 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 * Test the configuration by running:
     ```sh
     ./read_energy_meter.py
+    ./read_energy_meter.py --help # Shows you all available parameters
     ```
 * To run the python script at system startup. Add to following lines to the end of /etc/rc.local but before exit:
     ```sh

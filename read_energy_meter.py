@@ -8,6 +8,7 @@ import os
 import minimalmodbus
 import time
 import yaml
+import logging
 
 # Change working dir to the same dir as this script
 os.chdir(sys.path[0])
@@ -19,21 +20,21 @@ class DataCollector:
         self.max_iterations = None  # run indefinitely by default
         self.meter_map = None
         self.meter_map_last_change = -1
-        print 'Meters:'
+        log.info('Meters:')
         for meter in sorted(self.get_meters()):
-            print '\t', meter['id'], '<-->', meter['name']
+            log.info('\t {} <--> {}'.format( meter['id'], meter['name']))
 
     def get_meters(self):
         assert path.exists(self.meter_yaml), 'Meter map not found: %s' % self.meter_yaml
         if path.getmtime(self.meter_yaml) != self.meter_map_last_change:
             try:
-                print ('Reloading meter map as file changed')
+                log.info('Reloading meter map as file changed')
                 new_map = yaml.load(open(self.meter_yaml))
                 self.meter_map = new_map['meters']
                 self.meter_map_last_change = path.getmtime(self.meter_yaml)
             except Exception as e:
-                print ('Failed to re-load meter map, going on with the old one. Error:')
-                print (e)
+                log.warning('Failed to re-load meter map, going on with the old one.')
+                log.warning(e)
         return self.meter_map
 
     def collect_and_store(self):
@@ -58,18 +59,20 @@ class DataCollector:
             elif meter['parity'] == 'even':
                 instrument.serial.parity = minimalmodbus.serial.PARITY_EVEN
             else:
-                print ('Error: No parity specified')
+                log.error('No parity specified')
                 raise
             instrument.serial.stopbits = meter['stopbits']
             instrument.serial.timeout  = meter['timeout']    # seconds
             instrument.address = meter['id']    # this is the slave address number
 
-            #print 'Reading meter %s.' % (meter['id'])
+            log.debug('Reading meter %s.' % (meter['id']))
             start_time = time.time()
             parameters = yaml.load(open(meter['type']))
             datas[meter['id']] = dict()
 
             for parameter in parameters:
+                # If random readout errors occour, e.g. CRC check fail, test to uncomment the following row
+                #time.sleep(0.01) # Sleep for 10 ms between each parameter read to avoid errors
                 retries = 10
                 while retries > 0:
                     try:
@@ -78,25 +81,25 @@ class DataCollector:
                         retries = 0
                         pass
                     except ValueError as ve:
-                        print ('Value Error while reading register {} from meter {}. Retries left {}.'
+                        log.warning('Value Error while reading register {} from meter {}. Retries left {}.'
                                .format(parameters[parameter], meter['id'], retries))
-                        print ve
+                        log.error(ve)
                         if retries == 0:
                             raise RuntimeError
                     except TypeError as te:
-                        print ('Type Error while reading register {} from meter {}. Retries left {}.'
+                        log.warning('Type Error while reading register {} from meter {}. Retries left {}.'
                                .format(parameters[parameter], meter['id'], retries))
-                        print te
+                        log.error(te)
                         if retries == 0:
                             raise RuntimeError
                     except IOError as ie:
-                        print ('IO Error while reading register {} from meter {}. Retries left {}.'
+                        log.warning('IO Error while reading register {} from meter {}. Retries left {}.'
                                .format(parameters[parameter], meter['id'], retries))
-                        print ie
+                        log.error(ie)
                         if retries == 0:
                             raise RuntimeError
                     except:
-                        print "Unexpected error:", sys.exc_info()[0]
+                        log.error("Unexpected error:", sys.exc_info()[0])
                         raise
 
             datas[meter['id']]['Time to read'] =  time.time() - start_time
@@ -116,32 +119,28 @@ class DataCollector:
         if len(json_body) > 0:
             try:
                 self.influx_client.write_points(json_body)
-                print(t_str + ' Data written for %d meters.' % len(json_body))
+                log.info(t_str + ' Data written for %d meters.' % len(json_body))
             except Exception as e:
-                print('Data not written! Error:')
-                print(e)
+                log.error('Data not written!')
+                log.error(e)
                 raise
         else:
-            print(t_str, 'No data sent.')
+            log.warning(t_str, 'No data sent.')
 
 
 def repeat(interval_sec, max_iter, func, *args, **kwargs):
     from itertools import count
     import time
     starttime = time.time()
-    retry = False
     for i in count():
-        if (retry == False) & (interval_sec > 0):
+        if interval_sec > 0:
             time.sleep(interval_sec - ((time.time() - starttime) % interval_sec))
-        retry = False # Reset retry flag
         if i % 1000 == 0:
-            print('Collected %d readouts' % i)
+            log.info('Collected %d readouts' % i)
         try:
             func(*args, **kwargs)
         except Exception as ex:
-            print('Error!')
-            print(ex)
-            #retry = True # Force imidiate retry, skip sleep
+            log.error(ex)
         if max_iter and i >= max_iter:
             return
 
@@ -155,9 +154,30 @@ if __name__ == '__main__':
                         help='Meter readout interval (seconds), default 60')
     parser.add_argument('--meters', default='meters.yml',
                         help='YAML file containing Meter ID, name, type etc. Default "meters.yml"')
+    parser.add_argument('--log', default='CRITICAL',
+                        help='Log levels, DEBUG, INFO, WARNING, ERROR or CRITICAL')
+    parser.add_argument('--logfile', default='',
+                        help='Specify log file, if not specified the log is streamed to console')
     args = parser.parse_args()
     interval = int(args.interval)
-    
+    loglevel = args.log.upper()
+    logfile = args.logfile
+
+    # Setup logging
+    log = logging.getLogger('energy-logger')
+    log.setLevel(getattr(logging, loglevel))
+
+    if logfile:
+        loghandle = logging.FileHandler(logfile, 'w')
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        loghandle.setFormatter(formatter)
+    else:
+        loghandle = logging.StreamHandler()
+
+    log.addHandler(loghandle)
+
+    log.info('Started app')
+
     # Create the InfluxDB object
     influx_config = yaml.load(open('influx_config.yml'))
     client = InfluxDBClient(influx_config['host'],
