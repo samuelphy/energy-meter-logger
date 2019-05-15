@@ -109,7 +109,7 @@ class DataCollector:
                 'measurement': 'energy',
                 'tags': {
                     'id': meter_id,
-                    'meter': meter['name'],
+                    'meter': meter_id_name[meter_id],
                 },
                 'time': t_str,
                 'fields': datas[meter_id]
