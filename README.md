@@ -30,15 +30,19 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
     ```sh
     $ curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
     $ source /etc/os-release
-    $ test $VERSION_ID = "9" && echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+    $ sudo test $VERSION_ID = "10" && echo "deb https://repos.influxdata.com/debian buster stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
     ```
 * Download and install
     ```sh
     $ sudo apt-get update && sudo apt-get install influxdb
     ```
+* Unmask the influxdb service
+    ```sh
+    $ sudo systemctl unmask influxdb.service
+    ```
 * Start the influxdb service
     ```sh
-    $ sudo service influxdb start
+    $ sudo systemctl start influxdb
     ```
 * Create the database
     ```sh
