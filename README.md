@@ -76,6 +76,9 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 * Enable the systemd service so that Grafana starts at boot.
     ```sh
     $ sudo systemctl enable grafana-server.service
+    $ sudo service grafana-server start
+    $ sudo service grafana-server status
+    $ sudo update-rc.d grafana-server defaults
     ```
 * Go to http://localhost:3000 and login using admin / admin (remember to change password)
 [*source](http://docs.grafana.org/installation/debian/)
