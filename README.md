@@ -57,7 +57,7 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 ##### Step-by-step instructions
 * Add APT Repository
     ```sh
-    $ echo "deb https://dl.bintray.com/fg2it/deb-rpi-1b jessie main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+    $ echo "deb https://dl.bintray.com/fg2it/deb-rpi-1b stretch main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
     ```
 * Add Bintray key
     ```sh
@@ -65,7 +65,7 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
     ```
 * Now install
     ```sh
-    $ sudo apt-get update && sudo apt-get install grafana 
+    $ sudo apt-get update && sudo apt-get install grafana
     ```
 * Start the service using systemd:
     ```sh
