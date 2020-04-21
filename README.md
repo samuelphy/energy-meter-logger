@@ -48,7 +48,7 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
     ```sh
     $ influx
     CREATE DATABASE db_meters
-    exit 
+    exit
     ```
 [*source](https://docs.influxdata.com/influxdb/v1.3/introduction/installation/)
 
