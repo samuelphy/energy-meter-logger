@@ -29,7 +29,7 @@ class DataCollector:
         if path.getmtime(self.meter_yaml) != self.meter_map_last_change:
             try:
                 log.info('Reloading meter map as file changed')
-                new_map = yaml.load(open(self.meter_yaml))
+                new_map = yaml.load(open(self.meter_yaml), Loader=yaml.FullLoader)
                 self.meter_map = new_map['meters']
                 self.meter_map_last_change = path.getmtime(self.meter_yaml)
             except Exception as e:
@@ -67,7 +67,7 @@ class DataCollector:
 
             log.debug('Reading meter %s.' % (meter['id']))
             start_time = time.time()
-            parameters = yaml.load(open(meter['type']))
+            parameters = yaml.load(open(meter['type']), Loader=yaml.FullLoader)
             datas[meter['id']] = dict()
 
             for parameter in parameters:
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     log.info('Started app')
 
     # Create the InfluxDB object
-    influx_config = yaml.load(open('influx_config.yml'))
+    influx_config = yaml.load(open('influx_config.yml'), Loader=yaml.FullLoader)
     client = InfluxDBClient(influx_config['host'],
                             influx_config['port'],
                             influx_config['user'],
