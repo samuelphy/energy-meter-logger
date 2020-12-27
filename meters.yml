@@ -15,3 +15,12 @@ meters:
       parity : none # none | odd | even
       stopbits : 1
       timeout  : 0.5   # seconds
+    - name : Meter Orno OR-WE-517
+      type : orno_OR_WE_517.yml
+      id : 1                 # this is the slave address number
+      baudrate : 9600        # Baud
+      bytesize : 8
+      parity : even          # none | odd | even
+      stopbits : 1
+      timeout  : 0.6         # seconds
+      brand : orno

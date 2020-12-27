@@ -77,7 +77,11 @@ class DataCollector:
                 while retries > 0:
                     try:
                         retries -= 1
-                        datas[meter['id']][parameter] = instrument.read_float(parameters[parameter], 4, 2)
+                        if 'brand' in meter.keys() and meter['brand'] == 'orno':
+                           log.debug("brand......%s",meter['brand'])
+                           datas[meter['id']][parameter] = instrument.read_float(parameters[parameter], 3, 2, 0)
+                        else:
+                           datas[meter['id']][parameter] = instrument.read_float(parameters[parameter], 4, 2)
                         retries = 0
                         pass
                     except ValueError as ve:
