@@ -28,7 +28,7 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 #### Install InfluxDB*
 
 ##### Step-by-step instructions
-* Add the InfluxData repository
+* Add the InfluxData repository (change the debian release accoring to one you use, below is for buster)
     ```sh
     $ curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
     $ source /etc/os-release
