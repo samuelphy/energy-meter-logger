@@ -57,13 +57,15 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 #### Install Grafana*
 
 ##### Step-by-step instructions
-* Add APT Repository
+* Add APT Repository and key
     ```sh
-    $ echo "deb https://dl.bintray.com/fg2it/deb-rpi-1b stretch main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+sudo apt-get install -y apt-transport-https
+sudo apt-get install -y software-properties-common wget
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
     ```
-* Add Bintray key
+* Add Repository to package manager for stable channel
     ```sh
-    $ curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
+    echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
     ```
 * Now install
     ```sh
