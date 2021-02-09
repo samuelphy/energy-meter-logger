@@ -7,7 +7,7 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield or 
 #### Hardware
 
 * Raspberry Pi 3
-* [Linksprite RS485 Shield V3 for RPi](http://linksprite.com/wiki/index.php5?title=RS485/GPIO_Shield_for_Raspberry_Pi_V3.0)
+* [Linksprite RS485 Shield V3 for RPi](http://linksprite.com/wiki/index.php5?title=RS485/GPIO_Shield_for_Raspberry_Pi_V3.0) (discontinued and not suitable fro Pi4b and above)
 * OR
 * cheap generic USB convertor (like this one https://a.aliexpress.com/_ufjPgJ) 
 * Modbus based Energy Meter, e.g WEBIQ 131D / Eastron SDM120 or WEBIQ 343L / Eastron SMD630
