@@ -1,6 +1,6 @@
 # Energy Meter Logger
 Log your Energy Meter data on a Raspberry Pi and plot graphs of your energy consumption.
-Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and reading values from WEBIQ131D / SDM120 and WEBIQ343L / SDM630. By changing the meters.yml file and making a corresponding [model].yml file it should be possible to use other modbus enabled models.
+Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield or with generic cheap USB convertor and reading values from WEBIQ131D / SDM120 and WEBIQ343L / SDM630. By changing the meters.yml file and making a corresponding [model].yml file it should be possible to use other modbus enabled models.
 
 ### Requirements
 
@@ -8,6 +8,8 @@ Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and
 
 * Raspberry Pi 3
 * [Linksprite RS485 Shield V3 for RPi](http://linksprite.com/wiki/index.php5?title=RS485/GPIO_Shield_for_Raspberry_Pi_V3.0)
+*OR
+* cheap generic USB convertor (like this one https://a.aliexpress.com/_ufjPgJ) 
 * Modbus based Energy Meter, e.g WEBIQ 131D / Eastron SDM120 or WEBIQ 343L / Eastron SMD630
 
 #### Software
