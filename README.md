@@ -90,7 +90,7 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 #### Install Energy Meter Logger:
 * Download and install from Github
     ```sh
-    $ git clone https://github.com/Dulus0/energy-meter-logger
+    $ git clone https://github.com/samuelphy/energy-meter-logger
     ```
 * Run setup script (must be executed as root (sudo) if the application needs to be started from rc.local, see below)
     ```sh
