@@ -1,13 +1,15 @@
 # Energy Meter Logger
 Log your Energy Meter data on a Raspberry Pi and plot graphs of your energy consumption.
-Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield and reading values from WEBIQ131D / SDM120 and WEBIQ343L / SDM630. By changing the meters.yml file and making a corresponding [model].yml file it should be possible to use other modbus enabled models.
+Its been verified to work with a Raspberry Pi with a Linksprite RS485 shield or with generic cheap USB convertor and reading values from WEBIQ131D / SDM120 and WEBIQ343L / SDM630. By changing the meters.yml file and making a corresponding [model].yml file it should be possible to use other modbus enabled models.
 
 ### Requirements
 
 #### Hardware
 
 * Raspberry Pi 3
-* [Linksprite RS485 Shield V3 for RPi](http://linksprite.com/wiki/index.php5?title=RS485/GPIO_Shield_for_Raspberry_Pi_V3.0)
+* [Linksprite RS485 Shield V3 for RPi](http://linksprite.com/wiki/index.php5?title=RS485/GPIO_Shield_for_Raspberry_Pi_V3.0) (discontinued and not suitable fro Pi4b and above)
+* OR
+* cheap generic USB convertor (like this one https://a.aliexpress.com/_ufjPgJ) 
 * Modbus based Energy Meter, e.g WEBIQ 131D / Eastron SDM120 or WEBIQ 343L / Eastron SMD630
 
 #### Software
@@ -26,42 +28,48 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 #### Install InfluxDB*
 
 ##### Step-by-step instructions
-* Add the InfluxData repository
+* Add the InfluxData repository (change the debian release accoring to one you use, below is for buster)
     ```sh
     $ curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
     $ source /etc/os-release
-    $ test $VERSION_ID = "9" && echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+    $ sudo test $VERSION_ID = "10" && echo "deb https://repos.influxdata.com/debian buster stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
     ```
 * Download and install
     ```sh
     $ sudo apt-get update && sudo apt-get install influxdb
     ```
+* Unmask the influxdb service
+    ```sh
+    $ sudo systemctl unmask influxdb.service
+    ```
 * Start the influxdb service
     ```sh
-    $ sudo service influxdb start
+    $ sudo systemctl start influxdb
     ```
 * Create the database
     ```sh
     $ influx
     CREATE DATABASE db_meters
-    exit 
+    exit
     ```
 [*source](https://docs.influxdata.com/influxdb/v1.3/introduction/installation/)
 
 #### Install Grafana*
 
 ##### Step-by-step instructions
-* Add APT Repository
+* Add APT Repository and key
     ```sh
-    $ echo "deb https://dl.bintray.com/fg2it/deb-rpi-1b jessie main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+    sudo apt-get install -y apt-transport-https
+    sudo apt-get install -y software-properties-common wget
+    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
     ```
-* Add Bintray key
+* Add Repository to package manager for stable channel
     ```sh
-    $ curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
+    echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
     ```
 * Now install
     ```sh
-    $ sudo apt-get update && sudo apt-get install grafana 
+    $ sudo apt-get update && sudo apt-get install grafana
     ```
 * Start the service using systemd:
     ```sh
@@ -72,6 +80,9 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 * Enable the systemd service so that Grafana starts at boot.
     ```sh
     $ sudo systemctl enable grafana-server.service
+    $ sudo service grafana-server start
+    $ sudo service grafana-server status
+    $ sudo update-rc.d grafana-server defaults
     ```
 * Go to http://localhost:3000 and login using admin / admin (remember to change password)
 [*source](http://docs.grafana.org/installation/debian/)
