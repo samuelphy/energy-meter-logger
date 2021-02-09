@@ -59,9 +59,9 @@ This project has been documented at [Hackster](https://www.hackster.io/samuelphy
 ##### Step-by-step instructions
 * Add APT Repository and key
     ```sh
-sudo apt-get install -y apt-transport-https
-sudo apt-get install -y software-properties-common wget
-wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+    sudo apt-get install -y apt-transport-https
+    sudo apt-get install -y software-properties-common wget
+    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
     ```
 * Add Repository to package manager for stable channel
     ```sh
